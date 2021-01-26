@@ -11,6 +11,8 @@
     inputs:
     - name: data
       optional: false
+      default:
+        - https://valohai-hospital-demo.s3-eu-west-1.amazonaws.com/training_v2.csv
 - step:
     name: preprocess
     image: valohai/hospital-demo
