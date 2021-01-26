@@ -1,7 +1,7 @@
 - step:
     name: split
     image: valohai/hospital-demo
-    command: python ./split.py {parameters}
+    command: python3 ./split.py {parameters}
     parameters:
     - name: testsize
       default: 0.1
@@ -16,7 +16,7 @@
 - step:
     name: preprocess
     image: valohai/hospital-demo
-    command: python ./preprocess.py {parameters}
+    command: python3 ./preprocess.py {parameters}
     inputs:
     - name: data
       default:
@@ -29,7 +29,7 @@
 - step:
     name: train
     image: valohai/hospital-demo
-    command: python ./train.py {parameters}
+    command: python3 ./train.py {parameters}
     parameters:
     - name: learning_rate
       default: 0.001
@@ -73,7 +73,7 @@
 - step:
     name: predict
     image: valohai/hospital-demo
-    command: python ./predict.py {parameters}
+    command: python3 ./predict.py {parameters}
     inputs:
     - name: data
       default:
