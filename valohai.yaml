@@ -1,0 +1,109 @@
+- step:
+    name: split
+    image: python:3.7
+    command: python ./split.py {parameters}
+    parameters:
+    - name: testsize
+      default: 0.1
+      multiple-separator: ','
+      optional: false
+      type: float
+    inputs:
+    - name: data
+      default:
+      - https://valohai-hospital-demo.s3-eu-west-1.amazonaws.com/training_v2.csv
+      optional: false
+- step:
+    name: preprocess
+    image: python:3.7
+    command: python ./preprocess.py {parameters}
+    inputs:
+    - name: data
+      default:
+      - https://valohai-hospital-demo.s3-eu-west-1.amazonaws.com/training_v2.csv
+      optional: false
+    - name: dictionary
+      default:
+      - https://valohai-hospital-demo.s3-eu-west-1.amazonaws.com/dictionary.csv
+      optional: false
+- step:
+    name: train
+    image: python:3.7
+    command: python ./train.py {parameters}
+    parameters:
+    - name: learning_rate
+      default: 0.001
+      multiple-separator: ','
+      optional: false
+      type: float
+    - name: iterations
+      default: 10000
+      multiple-separator: ','
+      optional: false
+      type: integer
+    - name: early_stopping_rounds
+      default: 200
+      multiple-separator: ','
+      optional: false
+      type: integer
+    - name: depth
+      default: 6
+      multiple-separator: ','
+      optional: false
+      type: integer
+    - name: l2_leaf_reg
+      default: 3.0
+      multiple-separator: ','
+      optional: false
+      type: float
+    - name: random_seed
+      default: 123
+      multiple-separator: ','
+      optional: false
+      type: integer
+    inputs:
+    - name: data
+      default:
+      - https://valohai-hospital-demo.s3-eu-west-1.amazonaws.com/preprocessed.csv
+      optional: false
+- step:
+    name: predict
+    image: python:3.7
+    command: python ./predict.py {parameters}
+    inputs:
+    - name: data
+      default:
+      - https://valohai-hospital-demo.s3-eu-west-1.amazonaws.com/preprocessed.csv
+      optional: false
+    - name: model
+      default:
+      - https://valohai-hospital-demo.s3-eu-west-1.amazonaws.com/model.cbm
+      optional: false
+- pipeline:
+    name: re-train
+    nodes:
+      - name: split
+        type: execution
+        step: split
+      - name: preprocess_train
+        type: execution
+        step: preprocess
+      - name: preprocess_test
+        type: execution
+        step: preprocess
+      - name: train
+        type: execution
+        step: train
+      - name: predict_test
+        type: execution
+        step: predict
+      - name: predict_train
+        type: execution
+        step: predict
+    edges:
+      - [split.output.train.data*, preprocess_train.input.data]
+      - [split.output.train.labels*, train.input.labels]
+      - [split.output.test.data*, preprocess_test.input.data]
+      - [preprocess_train.output.data*, train.input.data]
+      - [preprocess_test.output.data*, predict_test.input.data]
+      - [train.output.model*, predict_train.input.model]
