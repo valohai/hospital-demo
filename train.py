@@ -77,6 +77,7 @@ class LogsFlush(Callback):
 
 data = {
     "data": "https://valohai-hospital-demo.s3-eu-west-1.amazonaws.com/preprocessed.csv",
+    "labels": "https://valohai-hospital-demo.s3-eu-west-1.amazonaws.com/labels.csv",
 }
 
 params = {
@@ -91,11 +92,12 @@ params = {
 valohai.prepare(step="train", parameters=params, inputs=data)
 
 df_train = pd.read_csv(get_input_path("data"))
+df_train["hospital_death"] = pd.read_csv(get_input_path("labels"))["hospital_death"]
 
 # df_train = pd.read_csv("training_v2_processed_cat.csv")
 # df_test = pd.read_csv("unlabeled_processed_cat.csv")
 
-df_train, df_train_val = train_test_split(df_train, test_size=get_parameter("testsize"))
+df_train, df_train_val = train_test_split(df_train, test_size=0.1)
 
 pd.set_option('display.max_rows', 100)
 pd.set_option('display.min_rows', 100)

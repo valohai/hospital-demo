@@ -66,6 +66,10 @@
       default:
       - https://valohai-hospital-demo.s3-eu-west-1.amazonaws.com/preprocessed.csv
       optional: false
+    - name: labels
+      default:
+      - https://valohai-hospital-demo.s3-eu-west-1.amazonaws.com/labels.csv
+      optional: false
 - step:
     name: predict
     image: python:3.7
