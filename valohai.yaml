@@ -22,6 +22,8 @@
       optional: false
     - name: dictionary
       optional: false
+      default:
+        - https://valohai-hospital-demo.s3-eu-west-1.amazonaws.com/dictionary.csv
 - step:
     name: train
     image: valohai/hospital-demo
