@@ -10,8 +10,6 @@
       type: float
     inputs:
     - name: data
-      default:
-      - https://valohai-hospital-demo.s3-eu-west-1.amazonaws.com/training_v2.csv
       optional: false
 - step:
     name: preprocess
@@ -19,12 +17,8 @@
     command: python3 ./preprocess.py {parameters}
     inputs:
     - name: data
-      default:
-      - https://valohai-hospital-demo.s3-eu-west-1.amazonaws.com/training_v2.csv
       optional: false
     - name: dictionary
-      default:
-      - https://valohai-hospital-demo.s3-eu-west-1.amazonaws.com/dictionary.csv
       optional: false
 - step:
     name: train
@@ -63,12 +57,8 @@
       type: integer
     inputs:
     - name: data
-      default:
-      - https://valohai-hospital-demo.s3-eu-west-1.amazonaws.com/preprocessed.csv
       optional: false
     - name: labels
-      default:
-      - https://valohai-hospital-demo.s3-eu-west-1.amazonaws.com/labels.csv
       optional: false
 - step:
     name: predict
@@ -76,12 +66,8 @@
     command: python3 ./predict.py {parameters}
     inputs:
     - name: data
-      default:
-      - https://valohai-hospital-demo.s3-eu-west-1.amazonaws.com/preprocessed.csv
       optional: false
     - name: model
-      default:
-      - https://valohai-hospital-demo.s3-eu-west-1.amazonaws.com/model.cbm
       optional: false
 - pipeline:
     name: re-train
