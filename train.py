@@ -3,54 +3,11 @@ import valohai
 
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense
-from tensorflow.keras.optimizers import SGD, Adam
-from tensorflow.keras.callbacks import ModelCheckpoint, Callback
-from tensorflow_core.python.keras.layers.core import Dropout
-from tensorflow_core.python.keras.layers.normalization_v2 import BatchNormalization
-from catboost import Pool, cv, CatBoostClassifier, CatBoostRegressor
+from catboost import Pool, CatBoostClassifier
 
 from valohai.parameters import get_parameter
 from valohai.inputs import get_input_path
 from valohai.paths import get_output_path
-from valohai.logs import log_partial, flush_logs
-from sklearn.metrics import roc_auc_score
-
-
-class RocCallback(Callback):
-    def __init__(self, training_data, validation_data):
-        self.x = training_data[0]
-        self.y = training_data[1]
-        self.x_val = validation_data[0]
-        self.y_val = validation_data[1]
-
-    def on_train_begin(self, logs={}):
-        return
-
-    def on_train_end(self, logs={}):
-        return
-
-    def on_epoch_begin(self, epoch, logs={}):
-        return
-
-    def on_epoch_end(self, epoch, logs={}):
-        if epoch % get_parameter("logfreq") == 0:
-            y_pred_train = self.model.predict_proba(self.x)
-            y_pred_train = y_pred_train[:, 1]
-            roc_train = roc_auc_score(self.y, y_pred_train)
-            y_pred_val = self.model.predict_proba(self.x_val)
-            y_pred_val = y_pred_val[:, 1]
-            roc_val = roc_auc_score(self.y_val, y_pred_val)
-            log_partial('roc-auc_train', str(round(roc_train, 4)))
-            log_partial('roc-auc_val', str(round(roc_val, 4)))
-            return
-
-    def on_batch_begin(self, batch, logs={}):
-        return
-
-    def on_batch_end(self, batch, logs={}):
-        return
 
 
 def clip_column(df, key, lower, upper):
@@ -60,19 +17,6 @@ def clip_column(df, key, lower, upper):
 def normalize_column(df, key):
     scaler = MinMaxScaler(feature_range=(0.0, 1.0))
     df[key] = scaler.fit_transform(df[[key]])
-
-
-class LogsCallback(Callback):
-    def on_epoch_end(self, epoch, logs=None):
-        if epoch % get_parameter("logfreq") == 0:
-            log_partial("epoch", epoch)
-            log_partial("val_loss", logs['val_loss'])
-            log_partial("accuracy", float(logs['accuracy']))
-
-
-class LogsFlush(Callback):
-    def on_epoch_end(self, epoch, logs=None):
-        flush_logs()
 
 
 data = {
@@ -93,10 +37,6 @@ valohai.prepare(step="train", parameters=params, inputs=data)
 
 df_train = pd.read_csv(get_input_path("data"))
 df_train["hospital_death"] = pd.read_csv(get_input_path("labels"))["hospital_death"]
-
-# df_train = pd.read_csv("training_v2_processed_cat.csv")
-# df_test = pd.read_csv("unlabeled_processed_cat.csv")
-
 df_train, df_train_val = train_test_split(df_train, test_size=0.1)
 
 pd.set_option('display.max_rows', 100)
@@ -170,9 +110,3 @@ model.fit(train_pool, plot=False)
 
 print(model.get_best_score()['learn'])
 model.save_model(get_output_path("model/model.cbm"))
-
-# test1 = df_test[fields_list + ['hospital_death', 'encounter_id']].copy()
-# probstest = model.predict_proba(df_test[fields_list])
-# probstest = probstest[:, 1]
-# test1["hospital_death"] = probstest
-# test1[["encounter_id", "hospital_death"]].to_csv(get_output_path("result.csv"), index=False)
