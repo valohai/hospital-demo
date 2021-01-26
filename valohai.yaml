@@ -27,6 +27,7 @@
 - step:
     name: train
     image: valohai/hospital-demo
+    environment: azure-westeurope-nc6
     command: python3 ./train.py {parameters}
     parameters:
     - name: learning_rate
