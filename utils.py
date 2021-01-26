@@ -101,7 +101,6 @@ def preprocess(df, df_dictionary):
 
 def predict(df, model):
     fields_list = list(df.columns)
-    fields_list.remove('hospital_death')
     fields_list.remove('encounter_id')
 
     probstest = model.predict_proba(df[fields_list])
