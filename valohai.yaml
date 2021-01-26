@@ -105,9 +105,9 @@
         type: execution
         step: predict
     edges:
-      - [split.output.train.data*, preprocess_train.input.data]
-      - [split.output.train.labels*, train.input.labels]
-      - [split.output.test.data*, preprocess_test.input.data]
+      - [split.output.train/data*, preprocess_train.input.data]
+      - [split.output.train/labels*, train.input.labels]
+      - [split.output.test/data*, preprocess_test.input.data]
       - [preprocess_train.output.data*, train.input.data]
       - [preprocess_test.output.data*, predict_train.input.data]
       - [preprocess_test.output.data*, predict_test.input.data]
